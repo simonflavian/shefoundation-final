@@ -26,9 +26,6 @@ importers:
       next:
         specifier: 16.3.3
         version: 16.3.3(@babel/core@7.29.7)(@types/node@24.10.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      node:
-        specifier: ^26.9.0
-        version: 26.9.0
       postgres:
         specifier: ^3.4.9
         version: 3.4.9
@@ -1423,16 +1420,8 @@ packages:
       sass:
         optional: true
 
-  node-bin-setup@1.1.4:
-    resolution: {integrity: sha512-vWNHOne0ZUavArqPP5LJta50+S8R261Fr5SvGul37HbEDcowvLjwdvd0ZeSr0r2lTSrPxl6okq9QUw8BFGiAxA==}
-
   node-releases@2.0.27:
     resolution: {integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==}
-
-  node@26.9.0:
-    resolution: {integrity: sha512-1EXZOs7Z3pEOFcj8NuuBDRxp3jy/pOU9C9jH3q/VAgREunNMJ0t5jZedhNVernLOsj6Jf+uJLURdgNjdQRvW/Q==}
-    engines: {npm: '>=5.0.0'}
-    hasBin: true
 
   npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
@@ -3062,13 +3051,7 @@ snapshots:
       - '@types/node'
       - babel-plugin-macros
 
-  node-bin-setup@1.1.4: {}
-
   node-releases@2.0.27: {}
-
-  node@26.9.0:
-    dependencies:
-      node-bin-setup: 1.1.4
 
   npm-run-path@4.0.1:
     dependencies:
