@@ -6,6 +6,7 @@ import { Lock } from 'lucide-react'
 
 export function LoginForm() {
   const router = useRouter()
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -18,7 +19,7 @@ export function LoginForm() {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -38,14 +39,23 @@ export function LoginForm() {
     <form className="admin-login-form" onSubmit={onSubmit}>
       <div className="admin-login-icon"><Lock size={20} /></div>
       <h1>Admin sign in</h1>
-      <p>Enter the shared admin password to manage applications and news posts.</p>
+      <p>Sign in with your admin account to manage applications and news posts.</p>
+      <label>
+        Email
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoFocus
+          required
+        />
+      </label>
       <label>
         Password
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          autoFocus
           required
         />
       </label>

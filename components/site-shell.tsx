@@ -212,6 +212,7 @@ export function SiteFooter() {
       </div>
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} {c.footer.rights}</span>
+        <a href="/admin/login">Staff Login</a>
         <a href="https://www.techiq.co.tz/" target="_blank" rel="noreferrer">{c.footer.credit}</a>
       </div>
     </footer>
