@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { ClipboardList, LogOut, Newspaper } from 'lucide-react'
+import { ClipboardList, LogOut, Newspaper, Users } from 'lucide-react'
 
 export function AdminNav() {
   const pathname = usePathname()
@@ -23,6 +23,9 @@ export function AdminNav() {
         </Link>
         <Link href="/admin/posts" className={pathname.startsWith('/admin/posts') ? 'active' : ''}>
           <Newspaper size={17} /> News posts
+        </Link>
+        <Link href="/admin/users" className={pathname.startsWith('/admin/users') ? 'active' : ''}>
+          <Users size={17} /> Users
         </Link>
       </nav>
       <button className="admin-nav-logout" onClick={logout}><LogOut size={16} /> Sign out</button>

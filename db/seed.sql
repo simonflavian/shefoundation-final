@@ -43,3 +43,15 @@ VALUES
   '2025-01-15T00:00:00Z'
 )
 ON CONFLICT (slug) DO NOTHING;
+
+-- Seeds one default admin account so the dashboard is reachable on a
+-- fresh database. Credentials were shared with the site owner directly
+-- (not committed here) — sign in once, add your own account from the
+-- Users section, then delete this seeded one.
+INSERT INTO admin_users (name, email, password_hash)
+VALUES (
+  'Site Admin',
+  'admin@shefoundation.or.tz',
+  '1b04f2cc477a78cfa75ad4e60775306c:15b3acd7bc54e35e49e4107b6113889d69db92c8d087ecf99e88df5f3384f080f80f28c408986cc064de8f2150d69c1f3fbd2ac34ad26b3185ccb20d843e78c9'
+)
+ON CONFLICT (email) DO NOTHING;

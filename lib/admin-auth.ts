@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { cookies } from 'next/headers'
+import { sql } from '@/lib/db'
 
 const COOKIE_NAME = 'she_admin_session'
 const MAX_AGE_SECONDS = 60 * 60 * 8
@@ -27,16 +28,29 @@ function verify(token: string): string | null {
   return value
 }
 
-export function checkPassword(input: string) {
-  const expected = process.env.ADMIN_PASSWORD
-  if (!expected) throw new Error('ADMIN_PASSWORD is not set.')
-  const a = Buffer.from(input)
-  const b = Buffer.from(expected)
-  return a.length === b.length && crypto.timingSafeEqual(a, b)
+export function hashPassword(password: string) {
+  const salt = crypto.randomBytes(16).toString('hex')
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex')
+  return `${salt}:${hash}`
 }
 
-export async function createSession() {
-  const value = `admin.${Date.now()}`
+export function verifyPassword(password: string, stored: string) {
+  const [salt, hash] = stored.split(':')
+  if (!salt || !hash) return false
+  const candidate = crypto.scryptSync(password, salt, 64)
+  const expected = Buffer.from(hash, 'hex')
+  return candidate.length === expected.length && crypto.timingSafeEqual(candidate, expected)
+}
+
+export async function authenticateUser(email: string, password: string) {
+  const rows = await sql`SELECT id, name, email, password_hash FROM admin_users WHERE lower(email) = lower(${email})`
+  const user = rows[0]
+  if (!user || !verifyPassword(password, user.password_hash)) return null
+  return { id: user.id as number, name: user.name as string, email: user.email as string }
+}
+
+export async function createSession(userId: number) {
+  const value = `admin.${userId}.${Date.now()}`
   const store = await cookies()
   store.set(COOKIE_NAME, sign(value), {
     httpOnly: true,
@@ -52,13 +66,29 @@ export async function destroySession() {
   store.delete(COOKIE_NAME)
 }
 
+function readSessionValue(value: string) {
+  const parts = value.split('.')
+  if (parts.length !== 3 || parts[0] !== 'admin') return null
+  const userId = Number(parts[1])
+  const timestamp = Number(parts[2])
+  if (!userId || !timestamp || Date.now() - timestamp > MAX_AGE_SECONDS * 1000) return null
+  return { userId, timestamp }
+}
+
 export async function isAuthenticated() {
   const store = await cookies()
   const token = store.get(COOKIE_NAME)?.value
   if (!token) return false
   const value = verify(token)
   if (!value) return false
-  const timestamp = Number(value.split('.')[1])
-  if (!timestamp || Date.now() - timestamp > MAX_AGE_SECONDS * 1000) return false
-  return true
+  return readSessionValue(value) !== null
+}
+
+export async function getSessionUserId() {
+  const store = await cookies()
+  const token = store.get(COOKIE_NAME)?.value
+  if (!token) return null
+  const value = verify(token)
+  if (!value) return null
+  return readSessionValue(value)?.userId ?? null
 }

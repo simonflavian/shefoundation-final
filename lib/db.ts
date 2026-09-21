@@ -33,6 +33,13 @@ export type Submission = {
   created_at: string
 }
 
+export type AdminUser = {
+  id: number
+  name: string
+  email: string
+  created_at: string
+}
+
 export type Post = {
   id: number
   slug: string
