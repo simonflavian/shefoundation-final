@@ -15,11 +15,29 @@ function createClient() {
   })
 }
 
-export const sql = globalThis.__sheDbClient ?? createClient()
-
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.__sheDbClient = sql
+function getClient() {
+  if (!globalThis.__sheDbClient) {
+    globalThis.__sheDbClient = createClient()
+  }
+  return globalThis.__sheDbClient
 }
+
+// Lazy proxy: the real connection (and the "POSTGRES_URL is not set" check)
+// is only created on first actual query, not on import. Next.js imports
+// every API route's module during the build's page-data-collection step,
+// so an eager connection here would fail the whole build whenever
+// POSTGRES_URL isn't configured yet — even for routes never called.
+export const sql = new Proxy((() => {}) as unknown as ReturnType<typeof postgres>, {
+  apply(_target, _thisArg, args) {
+    const client = getClient()
+    return (client as unknown as (...a: unknown[]) => unknown)(...args)
+  },
+  get(_target, prop, receiver) {
+    const client = getClient()
+    const value = Reflect.get(client as object, prop, receiver)
+    return typeof value === 'function' ? value.bind(client) : value
+  },
+})
 
 export type Submission = {
   id: number
